@@ -6,7 +6,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Office Buffer Calculator</title>
+    <title id="pageTitle">Office Buffer Calculator</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -167,6 +167,11 @@ function calculate(rows) {
     let totalDeviation = 0;
     let bufferCountUsed = 0;
     let maxBufferTaken = 0;
+    let employeeName = "";
+
+    if (rows.length > 1) {
+    employeeName = rows[1][2] || "";
+    }
 
     for (let i = 1; i < rows.length; i++) {
 
@@ -239,6 +244,17 @@ function calculate(rows) {
     document
     .getElementById("dashboardCard")
     .classList.remove("hidden");
+
+    updateTitle(employeeName);
+}
+
+function updateTitle(employeeName) {
+
+    const title = employeeName
+        ? `Office Buffer Calculator for ${employeeName}`
+        : "Office Buffer Calculator";
+
+    document.getElementById("pageTitle").textContent = title;
 }
 
 </script>

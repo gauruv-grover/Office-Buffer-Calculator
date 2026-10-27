@@ -23,6 +23,10 @@
             margin: auto;
         }
 
+        .hidden {
+            display: none;
+        }
+
         .card {
             background: white;
             padding: 20px;
@@ -73,7 +77,7 @@
                accept=".xlsx,.xls">
     </div>
 
-    <div class="card">
+    <div class="card hidden" id="dashboardCard">
 
         <div class="metrics">
 
@@ -231,6 +235,10 @@ function calculate(rows) {
     document.getElementById("maxBuffer")
     .textContent =
     Math.round(maxBufferTaken) + " min";
+
+    document
+    .getElementById("dashboardCard")
+    .classList.remove("hidden");
 }
 
 </script>

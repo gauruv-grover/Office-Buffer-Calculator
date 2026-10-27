@@ -1,1 +1,164 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buffer Calculator</title><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><style>body{font-family:Segoe UI,Arial,sans-serif;background:#f4f6f8;padding:20px}.card{background:#fff;padding:20px;border-radius:8px;margin-bottom:16px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px}th{background:#1f4e79;color:#fff}</style></head><body><div class="card"><h1>Buffer Calculator</h1><input type="file" id="excelFile" accept=".xlsx,.xls"></div><div class="card"><p>Total Deviation: <span id="totalDeviation">0</span></p><p>Remaining Buffer Time: <span id="remainingBuffer">90</span></p><p>Buffer Count Used: <span id="bufferUsed">0</span></p><p>Remaining Buffer Count: <span id="bufferRemaining">10</span></p><p>Max Buffer Taken: <span id="maxBuffer">0</span></p></div><div class="card"><table><thead><tr><th>Row</th><th>Date</th><th>Clock In</th><th>Clock Out</th><th>Duration (M)</th><th>Deviation (N)</th></tr></thead><tbody id="tb"></tbody></table></div><script>function excelTimeToMinutes(v){if(v==null||v==='')return null;if(typeof v==='number')return Math.round(v*24*60);let p=v.toString().split(':');if(p.length<2)return null;return parseInt(p[0])*60+parseInt(p[1]);}document.getElementById('excelFile').addEventListener('change',e=>{const f=e.target.files[0];const r=new FileReader();r.onload=x=>{const wb=XLSX.read(new Uint8Array(x.target.result),{type:'array'});const sh=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(sh,{header:1});calc(rows);};r.readAsArrayBuffer(f);});function calc(rows){let total=0,count=0,max=0;tb.innerHTML='';for(let i=1;i<rows.length;i++){const row=rows[i]||[];let a=excelTimeToMinutes(row[6]),b=excelTimeToMinutes(row[7]);if(a==null||b==null)continue;if(b<a)b+=1440;let dur=Number(((b-a)/60).toFixed(2));let dev=0;if(dur<9&&dur>=8.5)dev=Number(((9-dur)*60).toFixed(2));total+=dev;if(dev>0)count++;if(dev>max)max=dev;tb.innerHTML+=`<tr><td>${i+1}</td><td>${row[0]||''}</td><td>${row[6]||''}</td><td>${row[7]||''}</td><td>${dur}</td><td>${dev}</td></tr>`;}document.getElementById('totalDeviation').textContent=total.toFixed(2);document.getElementById('remainingBuffer').textContent=(90-total).toFixed(2);document.getElementById('bufferUsed').textContent=count;document.getElementById('bufferRemaining').textContent=10-count;document.getElementById('maxBuffer').textContent=max.toFixed(2);}</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buffer Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #f4f6f8;
+        padding: 20px;
+      }
+
+      .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      input[type="file"] {
+        display: block;
+        margin-top: 12px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 6px;
+      }
+
+      th {
+        background: #1f4e79;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Buffer Calculator</h1>
+      <input type="file" id="excelFile" accept=".xlsx,.xls" />
+    </div>
+
+    <div class="card">
+      <p>Total Deviation: <span id="totalDeviation">0</span></p>
+      <p>Remaining Buffer Time: <span id="remainingBuffer">90</span></p>
+      <p>Buffer Count Used: <span id="bufferUsed">0</span></p>
+      <p>Remaining Buffer Count: <span id="bufferRemaining">10</span></p>
+      <p>Max Buffer Taken: <span id="maxBuffer">0</span></p>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Date</th>
+            <th>Clock In</th>
+            <th>Clock Out</th>
+            <th>Duration (M)</th>
+            <th>Deviation (N)</th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+
+    <script>
+      const excelFileInput = document.getElementById("excelFile");
+      const tableBody = document.getElementById("tb");
+
+      function excelTimeToMinutes(value) {
+        if (value === null || value === "") return null;
+        if (typeof value === "number") return Math.round(value * 24 * 60);
+
+        const parts = value.toString().split(":");
+        if (parts.length < 2) return null;
+
+        return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+      }
+
+      excelFileInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = (loadEvent) => {
+          const workbook = XLSX.read(new Uint8Array(loadEvent.target.result), { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+          calculate(rows);
+        };
+
+        reader.readAsArrayBuffer(file);
+      });
+
+      function calculate(rows) {
+        let totalDeviation = 0;
+        let bufferCountUsed = 0;
+        let maxBufferTaken = 0;
+        tableBody.innerHTML = "";
+
+        for (let index = 1; index < rows.length; index += 1) {
+          const row = rows[index] || [];
+          let clockIn = excelTimeToMinutes(row[6]);
+          let clockOut = excelTimeToMinutes(row[7]);
+
+          if (clockIn === null || clockOut === null) {
+            continue;
+          }
+
+          if (clockOut < clockIn) {
+            clockOut += 1440;
+          }
+
+          const durationMinutes = Number(((clockOut - clockIn) / 60).toFixed(2));
+          let deviation = 0;
+
+          if (durationMinutes < 9 && durationMinutes > 8.5) {
+            deviation = Number(((9 - durationMinutes) * 60).toFixed(2));
+          }
+
+          totalDeviation += deviation;
+
+          if (deviation > 0) {
+            bufferCountUsed += 1;
+          }
+
+          if (deviation > maxBufferTaken) {
+            maxBufferTaken = deviation;
+          }
+
+          tableBody.innerHTML += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${row[0] || ""}</td>
+              <td>${row[6] || ""}</td>
+              <td>${row[7] || ""}</td>
+              <td>${durationMinutes}</td>
+              <td>${deviation}</td>
+            </tr>
+          `;
+        }
+
+        document.getElementById("totalDeviation").textContent = totalDeviation.toFixed(2);
+        document.getElementById("remainingBuffer").textContent = (90 - totalDeviation).toFixed(2);
+        document.getElementById("bufferUsed").textContent = bufferCountUsed;
+        document.getElementById("bufferRemaining").textContent = 10 - bufferCountUsed;
+        document.getElementById("maxBuffer").textContent = maxBufferTaken.toFixed(2);
+      }
+    </script>
+  </body>
+</html>

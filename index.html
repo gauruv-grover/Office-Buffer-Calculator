@@ -168,9 +168,11 @@ function calculate(rows) {
     let bufferCountUsed = 0;
     let maxBufferTaken = 0;
     let employeeName = "";
+    let monthYear = "";
 
     if (rows.length > 1) {
-    employeeName = rows[1][2] || "";
+        employeeName = rows[1][2] || "";
+        monthYear = getMonthYear(rows[1][3]);
     }
 
     for (let i = 1; i < rows.length; i++) {
@@ -245,16 +247,53 @@ function calculate(rows) {
     .getElementById("dashboardCard")
     .classList.remove("hidden");
 
-    updateTitle(employeeName);
+    updateTitle(employeeName, monthYear);
 }
 
-function updateTitle(employeeName) {
+function updateTitle(employeeName, monthYear) {
 
-    const title = employeeName
-        ? `Office Buffer Calculator for ${employeeName}`
-        : "Office Buffer Calculator";
+    let title = "Office Buffer Calculator";
 
-    document.getElementById("pageTitle").textContent = title;
+    if (employeeName) {
+        title += ` for ${employeeName}`;
+    }
+
+    if (monthYear) {
+        title += ` (${monthYear})`;
+    }
+
+    document.getElementById("pageTitle")
+        .textContent = title;
+}
+
+function getMonthYear(dateValue) {
+
+    let date;
+
+    if (dateValue instanceof Date) {
+        date = dateValue;
+    }
+    else if (typeof dateValue === "number") {
+        // Excel serial date
+        date = new Date(
+            (dateValue - 25569) * 86400 * 1000
+        );
+    }
+    else {
+        date = new Date(dateValue);
+    }
+
+    if (isNaN(date.getTime())) {
+        return "";
+    }
+
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            month: "long",
+            year: "numeric"
+        }
+    );
 }
 
 </script>

@@ -1,6 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Office Buffer Calculator</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .metric {
+            background: #1f4e79;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .metric h3 {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .metric p {
+            margin-top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
 <div class="container">
 
-    <div class="card upload-card">
+    <div class="card">
         <h1>Office Buffer Calculator</h1>
 
         <input type="file"
@@ -8,33 +73,33 @@
                accept=".xlsx,.xls">
     </div>
 
-    <div class="card hidden" id="dashboardCard">
+    <div class="card">
 
         <div class="metrics">
 
             <div class="metric">
-                <h3>Total Deviation (Minutes)</h3>
-                <p id="totalDeviation">0 min</p>
+                <h3>Total Deviation</h3>
+                <p id="totalDeviation">0</p>
             </div>
 
             <div class="metric">
-                <h3>Remaining Buffer Time (Minutes)</h3>
-                <p id="remainingBuffer">90 min</p>
+                <h3>Remaining Buffer Time</h3>
+                <p id="remainingBuffer">90</p>
             </div>
 
             <div class="metric">
-                <h3>Buffer Count Used (Days)</h3>
-                <p id="bufferUsed">0 days</p>
+                <h3>Buffer Count Used</h3>
+                <p id="bufferUsed">0</p>
             </div>
 
             <div class="metric">
-                <h3>Remaining Buffer Count (Days)</h3>
-                <p id="bufferRemaining">10 days</p>
+                <h3>Remaining Buffer Count</h3>
+                <p id="bufferRemaining">10</p>
             </div>
 
             <div class="metric">
-                <h3>Maximum Buffer Taken (Minutes)</h3>
-                <p id="maxBuffer">0 min</p>
+                <h3>Max Buffer Taken</h3>
+                <p id="maxBuffer">0</p>
             </div>
 
         </div>
@@ -42,3 +107,133 @@
     </div>
 
 </div>
+
+<script>
+
+function excelTimeToMinutes(value) {
+
+    if (value === null || value === undefined || value === "")
+        return null;
+
+    if (typeof value === "number")
+        return Math.round(value * 24 * 60);
+
+    const parts = value.toString().split(":");
+
+    return parseInt(parts[0]) * 60 +
+           parseInt(parts[1]);
+}
+
+document
+    .getElementById("excelFile")
+    .addEventListener("change", handleFile);
+
+function handleFile(event) {
+
+    const file = event.target.files[0];
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        const workbook = XLSX.read(
+            new Uint8Array(e.target.result),
+            { type: "array" }
+        );
+
+        const sheet =
+            workbook.Sheets[
+                workbook.SheetNames[0]
+            ];
+
+        const rows =
+            XLSX.utils.sheet_to_json(
+                sheet,
+                { header: 1 }
+            );
+
+        calculate(rows);
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+function calculate(rows) {
+
+    let totalDeviation = 0;
+    let bufferCountUsed = 0;
+    let maxBufferTaken = 0;
+
+    for (let i = 1; i < rows.length; i++) {
+
+        const row = rows[i];
+
+        const inTime =
+            excelTimeToMinutes(row[6]);
+
+        const outTime =
+            excelTimeToMinutes(row[7]);
+
+        if (inTime == null || outTime == null)
+            continue;
+
+        let adjustedOutTime = outTime;
+
+        if (adjustedOutTime < inTime)
+            adjustedOutTime += 1440;
+
+        const duration =
+            Number(
+                (
+                    (adjustedOutTime - inTime)
+                    / 60
+                ).toFixed(2)
+            );
+
+        let deviation = 0;
+
+        if (duration < 9 &&
+            duration >= 8.5) {
+
+            deviation =
+                Number(
+                    (
+                        (9 - duration) * 60
+                    ).toFixed(2)
+                );
+        }
+
+        totalDeviation += deviation;
+
+        if (deviation > 0)
+            bufferCountUsed++;
+
+        if (deviation > maxBufferTaken)
+            maxBufferTaken = deviation;
+    }
+
+    document.getElementById("totalDeviation")
+    .textContent =
+    Math.round(totalDeviation) + " min";
+
+    document.getElementById("remainingBuffer")
+    .textContent =
+    Math.round(90 - totalDeviation) + " min";
+    
+    document.getElementById("bufferUsed")
+    .textContent =
+    bufferCountUsed + " days";
+    
+    document.getElementById("bufferRemaining")
+    .textContent =
+    (10 - bufferCountUsed) + " days";
+    
+    document.getElementById("maxBuffer")
+    .textContent =
+    Math.round(maxBufferTaken) + " min";
+}
+
+</script>
+
+</body>
+</html>

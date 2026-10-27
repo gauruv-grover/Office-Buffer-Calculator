@@ -213,24 +213,25 @@ function calculate(rows) {
     }
 
     document.getElementById("totalDeviation")
-        .textContent =
-        totalDeviation.toFixed(2);
+    .textContent =
+    Math.round(totalDeviation) + " min";
 
     document.getElementById("remainingBuffer")
-        .textContent =
-        (90 - totalDeviation).toFixed(2);
+    .textContent =
+    Math.round(90 - totalDeviation) + " min";
 
     document.getElementById("bufferUsed")
-        .textContent =
-        bufferCountUsed;
+    .textContent =
+    bufferCountUsed + " days";
 
     document.getElementById("bufferRemaining")
-        .textContent =
-        10 - bufferCountUsed;
+    .textContent =
+    (10 - bufferCountUsed) + " days";
 
     document.getElementById("maxBuffer")
-        .textContent =
-        maxBufferTaken.toFixed(2);
+    .textContent =
+    Math.round(maxBufferTaken) + " min";
+
 }
 
 </script>

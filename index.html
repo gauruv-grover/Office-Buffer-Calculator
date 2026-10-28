@@ -100,17 +100,17 @@
                 <p id="bufferRemaining">10</p>
             </div>
 
-            <div class="metric">
-                <h3>Max Buffer Taken</h3>
-                <p id="maxBuffer">0</p>
-            </div>
+            <!-- <div class="metric">
+               <h3>Max Buffer Taken</h3>
+               <p id="maxBuffer">0</p>
+           </div> -->
 
-            <div class="metric">
+            <div class="metric hidden" id="metricTodayClockIn">
                 <h3>Today's Clock-In</h3>
                 <p id="todayClockIn">--</p>
             </div>
             
-            <div class="metric">
+            <div class="metric hidden" id="metricExpectedClockOut">
                 <h3>Expected Clock-Out</h3>
                 <p id="expectedClockOut">--</p>
             </div>
@@ -173,9 +173,19 @@ function handleFile(event) {
 
 function calculate(rows) {
 
+ // Reset dashboard
+    document.getElementById("totalDeviation").textContent = "0 min";
+    document.getElementById("remainingBuffer").textContent = "90 min";
+    document.getElementById("bufferUsed").textContent = "0 days";
+    document.getElementById("bufferRemaining").textContent = "10 days";
+    //document.getElementById("maxBuffer").textContent = "0 min";
+
+    document.getElementById("todayClockIn").textContent = "--";
+    document.getElementById("expectedClockOut").textContent = "--";
+
     let totalDeviation = 0;
     let bufferCountUsed = 0;
-    let maxBufferTaken = 0;
+    //let maxBufferTaken = 0;
     let employeeName = "";
     let monthYear = "";
     let todayClockIn = null;
@@ -196,6 +206,28 @@ function calculate(rows) {
         const outTime =
             excelTimeToMinutes(row[7]);
 
+	if (inTime == null)
+            continue;
+
+	const sheetDate = excelSerialToDate(row[3]);
+	const now = new Date();
+
+    	if (
+        	sheetDate.getDate() === now.getDate() &&
+        	sheetDate.getMonth() === now.getMonth() &&
+        	sheetDate.getFullYear() === now.getFullYear()
+    	) {
+
+        	todayClockIn = formatTime(inTime);
+
+	        expectedClockOut = formatTime(inTime + 540);
+		const calculatedClockOut = inTime + 540; // 9 hours
+
+		// 5:00 PM = 17 * 60 = 1020 minutes
+		expectedClockOut = formatTime(Math.max(calculatedClockOut, 1020));
+    	}
+	
+
         if (inTime == null || outTime == null)
             continue;
 
@@ -203,35 +235,7 @@ function calculate(rows) {
 
         if (adjustedOutTime < inTime)
             adjustedOutTime += 1440;
-
-        const rowDate = row[3];
-
-        const today = new Date();
-
-        const todayDateText = today.toLocaleDateString(
-            "en-IN",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
-            }
-        );
-
-        if (
-            rowDate &&
-            rowDate.toString().includes(
-                todayDateText.split(",")[0]
-            )
-        ) {
-        
-            if (inMin !== null) {
-        
-                todayClockIn = formatTime(inMin);
-        
-                expectedClockOut =
-                    formatTime(inMin + (9 * 60));
-            }
-        }
+	
         
         const duration =
             Number(
@@ -259,8 +263,8 @@ function calculate(rows) {
         if (deviation > 0)
             bufferCountUsed++;
 
-        if (deviation > maxBufferTaken)
-            maxBufferTaken = deviation;
+        //if (deviation > maxBufferTaken)
+           // maxBufferTaken = deviation;
     }
 
     document.getElementById("totalDeviation")
@@ -279,10 +283,18 @@ function calculate(rows) {
     .textContent =
     (10 - bufferCountUsed) + " days";
     
-    document.getElementById("maxBuffer")
-    .textContent =
-    Math.round(maxBufferTaken) + " min";
+   // document.getElementById("maxBuffer")
+  //  .textContent =
+ //   Math.round(maxBufferTaken) + " min";
 
+	if(todayClockIn) {
+	document
+    	.getElementById("metricTodayClockIn")
+    	.classList.remove("hidden");
+	document
+    	.getElementById("metricExpectedClockOut")
+    	.classList.remove("hidden");
+	}
     document.getElementById("todayClockIn")
     .textContent =
     todayClockIn || "--";
@@ -344,15 +356,25 @@ function getMonthYear(dateValue) {
     );
 }
 
-function formatTime(minutes) {
+function formatTime(totalMinutes) {
 
-    const hrs = Math.floor(minutes / 60) % 24;
-    const mins = minutes % 60;
+    const hours24 = Math.floor(totalMinutes / 60) % 24;
+    const minutes = totalMinutes % 60;
+
+    const period = hours24 >= 12 ? "PM" : "AM";
+
+    let hours12 = hours24 % 12;
+
+    if (hours12 === 0) {
+        hours12 = 12;
+    }
 
     return (
-        String(hrs).padStart(2, "0") +
+        hours12 +
         ":" +
-        String(mins).padStart(2, "0")
+        String(minutes).padStart(2, "0") +
+        " " +
+        period
     );
 }
 
@@ -367,6 +389,12 @@ function getTodayDateString() {
             month: "short",
             year: "numeric"
         }
+    );
+}
+
+function excelSerialToDate(serial) {
+    return new Date(
+        (serial - 25569) * 86400 * 1000
     );
 }
 

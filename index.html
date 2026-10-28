@@ -109,6 +109,11 @@
                 <h3>Today's Clock-In</h3>
                 <p id="todayClockIn">--</p>
             </div>
+
+		<div class="metric hidden" id="metricEarliestClockOut">
+    			<h3>Earliest Possible Clock-Out</h3>
+    			<p id="earliestClockOut">--</p>
+		</div>
             
             <div class="metric hidden" id="metricExpectedClockOut">
                 <h3>Expected Clock-Out</h3>
@@ -190,6 +195,8 @@ function calculate(rows) {
     let monthYear = "";
     let todayClockIn = null;
     let expectedClockOut = null;
+	let earliestClockOut = null;
+	let expectedClockOutMinutes = null;
 
     if (rows.length > 1) {
         employeeName = rows[1][2] || "";
@@ -225,6 +232,12 @@ function calculate(rows) {
 
 		// 5:00 PM = 17 * 60 = 1020 minutes
 		expectedClockOut = formatTime(Math.max(calculatedClockOut, 1020));
+
+		expectedClockOutMinutes =
+    		Math.max(calculatedClockOut, 1020);
+
+		expectedClockOut =
+    		formatTime(expectedClockOutMinutes);
     	}
 	
 
@@ -267,6 +280,17 @@ function calculate(rows) {
            // maxBufferTaken = deviation;
     }
 
+	const remainingBufferTime = Math.round(90 - totalDeviation);
+
+const usableBufferTime = Math.min(remainingBufferTime,30);
+	if (expectedClockOutMinutes !== null) {
+
+	    earliestClockOut = formatTime(
+        	expectedClockOutMinutes - usableBufferTime
+    		);
+	}
+
+
     document.getElementById("totalDeviation")
     .textContent =
     Math.round(totalDeviation) + " min";
@@ -294,6 +318,9 @@ function calculate(rows) {
 	document
     	.getElementById("metricExpectedClockOut")
     	.classList.remove("hidden");
+	document
+    	.getElementById("metricEarliestClockOut")
+    	.classList.remove("hidden");
 	}
     document.getElementById("todayClockIn")
     .textContent =
@@ -302,6 +329,9 @@ function calculate(rows) {
     document.getElementById("expectedClockOut")
     .textContent =
     expectedClockOut || "--";
+
+	document.getElementById("earliestClockOut")
+    	.textContent = earliestClockOut;
 
     document
     .getElementById("dashboardCard")
@@ -398,7 +428,9 @@ function excelSerialToDate(serial) {
     );
 }
 
+function subtractMinutes(timeInMinutes, minutesToSubtract) {
+    return timeInMinutes - minutesToSubtract;
+}
 </script>
-
 </body>
 </html>

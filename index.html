@@ -105,6 +105,16 @@
                 <p id="maxBuffer">0</p>
             </div>
 
+            <div class="metric">
+                <h3>Today's Clock-In</h3>
+                <p id="todayClockIn">--</p>
+            </div>
+            
+            <div class="metric">
+                <h3>Expected Clock-Out</h3>
+                <p id="expectedClockOut">--</p>
+            </div>
+
         </div>
 
     </div>
@@ -168,6 +178,8 @@ function calculate(rows) {
     let maxBufferTaken = 0;
     let employeeName = "";
     let monthYear = "";
+    let todayClockIn = null;
+    let expectedClockOut = null;
 
     if (rows.length > 1) {
         employeeName = rows[1][2] || "";
@@ -192,6 +204,35 @@ function calculate(rows) {
         if (adjustedOutTime < inTime)
             adjustedOutTime += 1440;
 
+        const rowDate = row[0];
+
+        const today = new Date();
+
+        const todayDateText = today.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+        if (
+            rowDate &&
+            rowDate.toString().includes(
+                todayDateText.split(",")[0]
+            )
+        ) {
+        
+            if (inMin !== null) {
+        
+                todayClockIn = formatTime(inMin);
+        
+                expectedClockOut =
+                    formatTime(inMin + (9 * 60));
+            }
+        }
+        
         const duration =
             Number(
                 (
@@ -242,6 +283,14 @@ function calculate(rows) {
     .textContent =
     Math.round(maxBufferTaken) + " min";
 
+    document.getElementById("todayClockIn")
+    .textContent =
+    todayClockIn || "--";
+
+    document.getElementById("expectedClockOut")
+    .textContent =
+    expectedClockOut || "--";
+
     document
     .getElementById("dashboardCard")
     .classList.remove("hidden");
@@ -290,6 +339,32 @@ function getMonthYear(dateValue) {
         "en-IN",
         {
             month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+function formatTime(minutes) {
+
+    const hrs = Math.floor(minutes / 60) % 24;
+    const mins = minutes % 60;
+
+    return (
+        String(hrs).padStart(2, "0") +
+        ":" +
+        String(mins).padStart(2, "0")
+    );
+}
+
+function getTodayDateString() {
+
+    const today = new Date();
+
+    return today.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
             year: "numeric"
         }
     );

@@ -24,7 +24,7 @@
         }
 
         .hidden {
-            display: none;
+            visibility: hidden;
         }
 
         .card {
@@ -37,9 +37,16 @@
 
         .metrics {
             display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+	#hiddenMetric {
+            display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
+
 
         .metric {
             background: #1f4e79;
@@ -104,23 +111,24 @@
                <h3>Max Buffer Taken</h3>
                <p id="maxBuffer">0</p>
            </div> -->
-
-            <div class="metric hidden" id="metricTodayClockIn">
+        </div>
+<br>
+	<div class="metrics" id="hiddenMetric">
+		<div class="metric">
                 <h3>Today's Clock-In</h3>
                 <p id="todayClockIn">--</p>
             </div>
 
-		<div class="metric hidden" id="metricEarliestClockOut">
+		<div class="metric">
     			<h3>Earliest Possible Clock-Out</h3>
     			<p id="earliestClockOut">--</p>
 		</div>
             
-            <div class="metric hidden" id="metricExpectedClockOut">
+            <div class="metric">
                 <h3>Expected Clock-Out</h3>
                 <p id="expectedClockOut">--</p>
             </div>
-
-        </div>
+	</div>
 
     </div>
 
@@ -311,16 +319,10 @@ const usableBufferTime = Math.min(remainingBufferTime,30);
   //  .textContent =
  //   Math.round(maxBufferTaken) + " min";
 
-	if(todayClockIn) {
+	if(!todayClockIn) {
 	document
-    	.getElementById("metricTodayClockIn")
-    	.classList.remove("hidden");
-	document
-    	.getElementById("metricExpectedClockOut")
-    	.classList.remove("hidden");
-	document
-    	.getElementById("metricEarliestClockOut")
-    	.classList.remove("hidden");
+    	.getElementById("hiddenMetric")
+    	.classList.add("hidden");
 	}
     document.getElementById("todayClockIn")
     .textContent =
@@ -431,6 +433,8 @@ function excelSerialToDate(serial) {
 function subtractMinutes(timeInMinutes, minutesToSubtract) {
     return timeInMinutes - minutesToSubtract;
 }
+
 </script>
+
 </body>
 </html>

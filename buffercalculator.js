@@ -71,7 +71,7 @@
 
     let totalDeviation = 0;
     let bufferCountUsed = 0;
-    let maxBufferTaken = 0;
+    //let maxBufferTaken = 0;
 
     data.forEach(row => {
 
@@ -114,16 +114,16 @@
             bufferCountUsed++;
         }
 
-        if (deviation > maxBufferTaken) {
-            maxBufferTaken = deviation;
-        }
+        // if (deviation > maxBufferTaken) {
+        //     maxBufferTaken = deviation;
+        // }
     });
 
     totalDeviation =
         Math.round(totalDeviation);
 
-    maxBufferTaken =
-        Math.round(maxBufferTaken);
+    // maxBufferTaken =
+    //     Math.round(maxBufferTaken);
 
     const remainingBufferTime =
         Math.max(
@@ -244,7 +244,7 @@
                     font-weight:bold;
                     font-size:15px;
                 ">
-                    ${employeeName}
+                    // ${employeeName}
                 </div>
 
                 <div>
@@ -284,10 +284,10 @@
                     <b>${remainingBufferCount} days</b>
                 </div>
 
-                <div>
-                    Max Buffer:
-                    <b>${maxBufferTaken} min</b>
-                </div>
+                // <div>
+                //     Max Buffer:
+                //     <b>${maxBufferTaken} min</b>
+                // </div>
 
             </div>
         </div>

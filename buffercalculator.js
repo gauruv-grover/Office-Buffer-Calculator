@@ -71,8 +71,7 @@
 
     let totalDeviation = 0;
     let bufferCountUsed = 0;
-    //let maxBufferTaken = 0;
-
+    
     data.forEach(row => {
 
         const inMin =
@@ -113,17 +112,10 @@
         if (deviation > 0) {
             bufferCountUsed++;
         }
-
-        // if (deviation > maxBufferTaken) {
-        //     maxBufferTaken = deviation;
-        // }
     });
 
     totalDeviation =
         Math.round(totalDeviation);
-
-    // maxBufferTaken =
-    //     Math.round(maxBufferTaken);
 
     const remainingBufferTime =
         Math.max(
@@ -284,10 +276,6 @@
                     <b>${remainingBufferCount} days</b>
                 </div>
 
-                // <div>
-                //     Max Buffer:
-                //     <b>${maxBufferTaken} min</b>
-                // </div>
 
             </div>
         </div>

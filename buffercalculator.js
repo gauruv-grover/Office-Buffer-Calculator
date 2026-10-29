@@ -132,6 +132,17 @@
     const today =
         new Date();
 
+    const lastDayOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() + 1,
+        0
+    );
+    
+    const bufferResetDays = Math.ceil(
+        (lastDayOfMonth - today) /
+        (1000 * 60 * 60 * 24)
+    );
+
     let todayClockIn = "--";
     let expectedClockOut = "--";
     let earliestClockOut = "--";
@@ -272,6 +283,10 @@
                 <div>
                     Buffer Remaining:
                     <b>${remainingBufferCount} days</b>
+                </div>
+                <div>
+                    Buffer Resets In:
+                    <b>${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}</b>
                 </div>
             </div>
         </div>

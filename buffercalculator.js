@@ -236,7 +236,6 @@
                     font-weight:bold;
                     font-size:15px;
                 ">
-                    // ${employeeName}
                 </div>
 
                 <div>
@@ -270,13 +269,10 @@
                     Buffer Used:
                     <b>${bufferCountUsed} days</b>
                 </div>
-
                 <div>
                     Buffer Remaining:
                     <b>${remainingBufferCount} days</b>
                 </div>
-
-
             </div>
         </div>
     `;

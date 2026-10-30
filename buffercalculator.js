@@ -1,5 +1,20 @@
 (function () {
 
+    const calendar =
+    document.querySelector(
+        "tbody.MyTbody"
+        );
+    
+    if (!calendar) {
+    
+        alert(
+            "Please go to Samay Homepage for this to work!"
+        );
+    
+        return;
+    }
+
+
     const existing =
         document.getElementById(
             "buffer-dashboard"

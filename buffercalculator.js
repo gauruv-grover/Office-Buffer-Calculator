@@ -395,7 +395,7 @@ halfDayClockOut =
 
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         <span>Buffer Used:</span>
-        <strong>${bufferCountUsed} days</strong>
+        <strong>${totalDeviation} min</strong>
     </div>
 
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">

@@ -288,7 +288,7 @@ halfDayClockOut =
             const usableBuffer =
                 Math.min(
                     remainingBuffer,
-                    30
+                    29
                 );
 
             earliestClockOut =

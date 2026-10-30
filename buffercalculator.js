@@ -335,7 +335,7 @@ halfDayClockOut =
     card.innerHTML = `
         <div style="
             position:fixed;
-            top:80px;
+            top:70px;
             right:20px;
             width:360px;
             background:white;

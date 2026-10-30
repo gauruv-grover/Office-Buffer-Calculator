@@ -2,66 +2,33 @@
 
     const existing = document.getElementById("buffer-dashboard");
 
-    if (existing) {
-        existing.remove();
-    }
-
-    const rows = [...document.querySelectorAll("table tr")];
-
-    const data = [];
-    let employeeName = "";
-
-    rows.slice(1).forEach(row => {
-
-        const cols = [...row.querySelectorAll("td")];
-
-        if (cols.length < 8) return;
-
-        if (!employeeName) {
-            employeeName = cols[2]?.innerText?.trim();
-        }
-
-        data.push({
-            date: cols[3]?.innerText?.trim(),
-            clockIn: cols[6]?.innerText?.trim(),
-            clockOut: cols[7]?.innerText?.trim()
-        });
-    });
+    if (existing) existing.remove();
 
     function timeToMinutes(time) {
 
         if (!time) return null;
 
-        const parts = time.split(":");
+        const [h, m] = time.split(":");
 
-        if (parts.length < 2) return null;
-
-        return (
-            parseInt(parts[0], 10) * 60 +
-            parseInt(parts[1], 10)
-        );
+        return parseInt(h, 10) * 60 +
+               parseInt(m, 10);
     }
 
     function format12Hour(minutes) {
 
-        const hour24 =
-            Math.floor(minutes / 60) % 24;
-
-        const mins =
-            minutes % 60;
+        const h24 = Math.floor(minutes / 60) % 24;
+        const mins = minutes % 60;
 
         const ampm =
-            hour24 >= 12 ? "PM" : "AM";
+            h24 >= 12 ? "PM" : "AM";
 
-        let hour12 =
-            hour24 % 12;
+        let h12 =
+            h24 % 12;
 
-        if (hour12 === 0) {
-            hour12 = 12;
-        }
+        if (h12 === 0) h12 = 12;
 
         return (
-            hour12 +
+            h12 +
             ":" +
             String(mins).padStart(2, "0") +
             " " +
@@ -69,16 +36,60 @@
         );
     }
 
+    const entries = [];
+
+    document
+        .querySelectorAll(
+            "td.current-p, td.current-lv"
+        )
+        .forEach(cell => {
+
+            const clockIn =
+                cell.querySelector(
+                    ".clock-in .tooltip"
+                )?.textContent?.trim();
+
+            const clockOut =
+                cell.querySelector(
+                    ".clock-out .tooltip"
+                )?.textContent?.trim();
+
+            const status =
+                cell.querySelector(
+                    ".status .tooltip"
+                )?.textContent?.trim();
+
+            const dateText =
+                cell.querySelector(
+                    ".date .tooltip"
+                )?.textContent?.trim();
+
+            if (!clockIn || !clockOut)
+                return;
+
+            entries.push({
+                date: parseInt(dateText, 10),
+                clockIn,
+                clockOut,
+                status
+            });
+        });
+
     let totalDeviation = 0;
     let bufferCountUsed = 0;
-    
-    data.forEach(row => {
+    let maxBufferTaken = 0;
 
-        const inMin =
-            timeToMinutes(row.clockIn);
+    entries.forEach(day => {
 
-        const outMin =
-            timeToMinutes(row.clockOut);
+        let inMin =
+            timeToMinutes(
+                day.clockIn
+            );
+
+        let outMin =
+            timeToMinutes(
+                day.clockOut
+            );
 
         if (
             inMin === null ||
@@ -87,15 +98,12 @@
             return;
         }
 
-        let adjustedOut =
-            outMin;
-
-        if (adjustedOut < inMin) {
-            adjustedOut += 1440;
+        if (outMin < inMin) {
+            outMin += 1440;
         }
 
         const duration =
-            (adjustedOut - inMin) / 60;
+            (outMin - inMin) / 60;
 
         let deviation = 0;
 
@@ -105,25 +113,33 @@
         ) {
             deviation =
                 (9 - duration) * 60;
-        }
 
-        totalDeviation += deviation;
-
-        if (deviation > 0) {
+            totalDeviation += deviation;
             bufferCountUsed++;
+
+            if (
+                deviation >
+                maxBufferTaken
+            ) {
+                maxBufferTaken =
+                    deviation;
+            }
         }
     });
 
     totalDeviation =
         Math.round(totalDeviation);
 
-    const remainingBufferTime =
+    maxBufferTaken =
+        Math.round(maxBufferTaken);
+
+    const remainingBuffer =
         Math.max(
             0,
             90 - totalDeviation
         );
 
-    const remainingBufferCount =
+    const bufferRemaining =
         Math.max(
             0,
             10 - bufferCountUsed
@@ -132,73 +148,66 @@
     const today =
         new Date();
 
-    const lastDayOfMonth = new Date(
-        today.getFullYear(),
-        today.getMonth() + 1,
-        0
-    );
-    
-    const bufferResetDays = Math.ceil(
-        (lastDayOfMonth - today) /
-        (1000 * 60 * 60 * 24)
-    );
-
     let todayClockIn = "--";
     let expectedClockOut = "--";
     let earliestClockOut = "--";
 
-    data.forEach(row => {
+    const todayEntry =
+        entries.find(
+            e =>
+                e.date ===
+                today.getDate()
+        );
 
-        if (!row.date) return;
+    if (todayEntry) {
 
-        const rowDate =
-            new Date(
-                row.date.replace(/-/g, " ")
+        const inMin =
+            timeToMinutes(
+                todayEntry.clockIn
             );
 
-        if (
-            rowDate.getDate() === today.getDate() &&
-            rowDate.getMonth() === today.getMonth() &&
-            rowDate.getFullYear() === today.getFullYear()
-        ) {
+        todayClockIn =
+            format12Hour(inMin);
 
-            const inMin =
-                timeToMinutes(
-                    row.clockIn
-                );
+        const expectedMinutes =
+            Math.max(
+                inMin + 540,
+                17 * 60
+            );
 
-            if (inMin !== null) {
+        expectedClockOut =
+            format12Hour(
+                expectedMinutes
+            );
 
-                todayClockIn =
-                    format12Hour(
-                        inMin
-                    );
+        const usableBuffer =
+            Math.min(
+                remainingBuffer,
+                30
+            );
 
-                const expectedClockOutMinutes =
-                    Math.max(
-                        inMin + 540,
-                        17 * 60
-                    );
+        earliestClockOut =
+            format12Hour(
+                expectedMinutes -
+                usableBuffer
+            );
+    }
 
-                expectedClockOut =
-                    format12Hour(
-                        expectedClockOutMinutes
-                    );
+    const lastDayOfMonth =
+        new Date(
+            today.getFullYear(),
+            today.getMonth() + 1,
+            0
+        );
 
-                const usableBufferToday =
-                    Math.min(
-                        remainingBufferTime,
-                        30
-                    );
-
-                earliestClockOut =
-                    format12Hour(
-                        expectedClockOutMinutes -
-                        usableBufferToday
-                    );
-            }
-        }
-    });
+    const bufferResetDays =
+        Math.ceil(
+            (
+                lastDayOfMonth -
+                today
+            ) /
+            (1000 * 60 * 60 * 24)
+        );
 
     const card =
         document.createElement("div");
@@ -209,14 +218,14 @@
     card.innerHTML = `
         <div style="
             position:fixed;
-            top:90px;
+            top:80px;
             right:20px;
-            width:340px;
+            width:360px;
             background:white;
             border-radius:12px;
-            box-shadow:0 4px 20px rgba(0,0,0,.25);
+            box-shadow:0 8px 24px rgba(0,0,0,.25);
             z-index:999999;
-            font-family:Segoe UI;
+            font-family:'Segoe UI';
             overflow:hidden;
         ">
             <div style="
@@ -230,64 +239,54 @@
                 <span>Buffer Dashboard</span>
 
                 <span
-                    style="cursor:pointer"
+                    style="cursor:pointer;"
                     onclick="
                         document
-                        .getElementById('buffer-dashboard')
+                        .getElementById(
+                         'buffer-dashboard'
+                        )
                         .remove();
                     ">
                     ✕
                 </span>
             </div>
 
-            <div style="padding:15px">
+            <div style="
+                padding:16px;
+                line-height:1.9;
+            ">
 
-                <div style="
-                    margin-bottom:12px;
-                    font-weight:bold;
-                    font-size:15px;
-                ">
-                </div>
+                Today's Clock-In:
+                <strong>${todayClockIn}</strong>
+                <br>
 
-                <div>
-                    Today's Clock-In:
-                    <b>${todayClockIn}</b>
-                </div>
+                Expected Clock-Out:
+                <strong>${expectedClockOut}</strong>
+                <br>
 
-                <div>
-                    Expected Clock-Out:
-                    <b>${expectedClockOut}</b>
-                </div>
+                Earliest Clock-Out:
+                <strong>${earliestClockOut}</strong>
+                <br>
 
-                <div>
-                    Earliest Clock-Out:
-                    <b>${earliestClockOut}</b>
-                </div>
+                Total Deviation:
+                <strong>${totalDeviation} min</strong>
+                <br>
 
-                <hr>
+                Remaining Buffer:
+                <strong>${remainingBuffer} min</strong>
+                <br>
 
-                <div>
-                    Total Deviation:
-                    <b>${totalDeviation} min</b>
-                </div>
+                Buffer Used:
+                <strong>${bufferCountUsed} days</strong>
+                <br>
 
-                <div>
-                    Remaining Buffer:
-                    <b>${remainingBufferTime} min</b>
-                </div>
+                Buffer Remaining:
+                <strong>${bufferRemaining} days</strong>
+                <br>
 
-                <div>
-                    Buffer Used:
-                    <b>${bufferCountUsed} days</b>
-                </div>
-                <div>
-                    Buffer Remaining:
-                    <b>${remainingBufferCount} days</b>
-                </div>
-                <div>
-                    Buffer Resets In:
-                    <b>${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}</b>
-                </div>
+                Buffer Resets In:
+                <strong>${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}</strong>
+
             </div>
         </div>
     `;

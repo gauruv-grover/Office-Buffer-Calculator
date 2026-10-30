@@ -344,70 +344,132 @@
                     ✕
                 </span>
             </div>
+<div style="padding:12px;">
+    <button id="downloadBufferDashboard"
+        style="
+            width:100%;
+            background:#1f4e79;
+            color:white;
+            border:none;
+            padding:10px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:14px;
+            font-weight:600;
+        ">
+        Download Dashboard
+    </button>
+</div>
 
             <div style="
-                padding:16px;
-                line-height:1.9;
-            ">
+    padding:16px;
+">
 
-                Today's Clock-In:
-                <strong>${
-                    todayClockIn
-                }</strong>
-                <br>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Buffer Used:</span>
+        <strong>${bufferCountUsed} days</strong>
+    </div>
 
-                Expected Clock-Out:
-                <strong>${
-                    expectedClockOut
-                }</strong>
-                <br>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Remaining Buffer:</span>
+        <strong>${remainingBuffer} min</strong>
+    </div>
 
-                Earliest Clock-Out:
-                <strong>${
-                    earliestClockOut
-                }</strong>
-                <br>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Buffer Events Used:</span>
+        <strong>${bufferCountUsed} days</strong>
+    </div>
 
-                Total Deviation:
-                <strong>${
-                    totalDeviation
-                } min</strong>
-                <br>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Buffer Events Remaining:</span>
+        <strong>${bufferRemaining} days</strong>
+    </div>
 
-                Remaining Buffer:
-                <strong>${
-                    remainingBuffer
-                } min</strong>
-                <br>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Buffer Resets In:</span>
+        <strong>${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}</strong>
+    </div>
 
-                Buffer Used:
-                <strong>${
-                    bufferCountUsed
-                } days</strong>
-                <br>
+    <div style="
+        border-top:1px solid #ddd;
+        margin:12px 0;
+    "></div>
 
-                Buffer Remaining:
-                <strong>${
-                    bufferRemaining
-                } days</strong>
-                <br>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Today's Clock-In:</span>
+        <strong>${todayClockIn}</strong>
+    </div>
 
-                Buffer Resets In:
-                <strong>${
-                    bufferResetDays
-                } day${
-                    bufferResetDays !== 1
-                        ? "s"
-                        : ""
-                }</strong>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Expected Clock-Out:</span>
+        <strong>${expectedClockOut}</strong>
+    </div>
 
-            </div>
+    <div style="display:flex;justify-content:space-between;">
+        <span>Earliest Clock-Out:</span>
+        <strong>${earliestClockOut}</strong>
+    </div>
+
+</div>
 
         </div>
     `;
 
-    document.body.appendChild(
-        card
-    );
+    document.body.appendChild(card);
+document
+    .getElementById("downloadBufferDashboard")
+    .addEventListener("click", () => {
+
+        const content = `
+BUFFER DASHBOARD
+================
+
+Total Deviation       : ${totalDeviation} min
+Remaining Buffer      : ${remainingBuffer} min
+
+Buffer Events Used    : ${bufferCountUsed} days
+Buffer Events Remaining : ${bufferRemaining} days
+
+Buffer Resets In      : ${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}
+
+Today's Clock-In      : ${todayClockIn}
+Expected Clock-Out    : ${expectedClockOut}
+Earliest Clock-Out    : ${earliestClockOut}
+`.trim();
+
+        const blob = new Blob(
+            [content],
+            { type: "text/plain" }
+        );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const a =
+            document.createElement("a");
+
+        const today =
+            new Date();
+
+        const dateString =
+            today.getFullYear() +
+            "-" +
+            String(today.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(today.getDate()).padStart(2, "0");
+
+        a.href = url;
+
+        a.download =
+            `BufferDashboard-${dateString}.txt`;
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    });
 
 })();

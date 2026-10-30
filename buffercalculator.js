@@ -223,6 +223,8 @@
     let earliestClockOut =
         "--";
 
+let halfDayClockOut = "--";
+
     if (todayEntry) {
 
         if (
@@ -239,6 +241,17 @@
                 timeToMinutes(
                     todayEntry.clockIn
                 );
+
+const effectiveClockIn =
+    Math.max(
+        inMin,
+        8 * 60
+    );
+
+halfDayClockOut =
+    format12Hour(
+        effectiveClockIn + 270
+    );
 
             todayClockIn =
                 format12Hour(
@@ -361,7 +374,7 @@
     </button>
 </div>
 
-            <div style="
+<div style="
     padding:16px;
 ">
 
@@ -405,14 +418,20 @@
         <strong>${expectedClockOut}</strong>
     </div>
 
-    <div style="display:flex;justify-content:space-between;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         <span>Earliest Clock-Out:</span>
         <strong>${earliestClockOut}</strong>
     </div>
 
+
+    <div style="display:flex;justify-content:space-between;">
+        <span>Half-Day Clock-Out:</span>
+        <strong>${halfDayClockOut}</strong>
+    </div>
+
 </div>
 
-        </div>
+</div>
     `;
 
     document.body.appendChild(card);
@@ -435,6 +454,7 @@ Buffer Resets In      : ${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""
 Today's Clock-In      : ${todayClockIn}
 Expected Clock-Out    : ${expectedClockOut}
 Earliest Clock-Out    : ${earliestClockOut}
+Half-Day Clock-Out    : ${halfDayClockOut}
 `.trim();
 
         const blob = new Blob(

@@ -346,7 +346,7 @@ halfDayClockOut =
             overflow:hidden;
         ">
             <div style="
-                background:#1f4e79;
+                background:#160b8b;
                 color:white;
                 padding:12px 16px;
                 font-weight:bold;
@@ -376,7 +376,7 @@ halfDayClockOut =
     <button id="downloadBufferDashboard"
         style="
             width:100%;
-            background:#1f4e79;
+            background:#160b8b;
             color:white;
             border:none;
             padding:10px;

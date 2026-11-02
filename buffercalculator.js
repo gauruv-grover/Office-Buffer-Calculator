@@ -1,19 +1,24 @@
 (function () {
 
-    const calendar =
+const calendar =
     document.querySelector(
         "tbody.MyTbody"
-        );
-    
-    if (!calendar) {
-    
-        alert(
-            "Please go to Samay Homepage for this to work!"
-        );
-    
-        return;
-    }
+    );
 
+if (!calendar) {
+
+    alert(
+        "Buffer Dashboard can only be used on the Samay Homepage."
+    );
+
+    return;
+}
+
+const monthLabel =
+    document
+        .getElementById("lbl")
+        ?.textContent
+        ?.trim();
 
     const existing =
         document.getElementById(
@@ -218,17 +223,37 @@
                 bufferCountUsed
         );
 
+    const currentMonthYear =
+    new Date()
+        .toLocaleDateString(
+            "en-US",
+            {
+                month: "long",
+                year: "numeric"
+            }
+        )
+        .replace(" ", "-");
+
+const calendarMatchesCurrentMonth =
+    monthLabel === currentMonthYear;
+
+let todayEntry = null;
+
+if (calendarMatchesCurrentMonth) {
+
     const todayDay =
         new Date()
             .getDate();
 
-    const todayEntry =
+    todayEntry =
         entries.find(
             e =>
                 e.date ===
                 todayDay
         );
+}
 
+           
     let todayClockIn =
         "--";
 
@@ -389,13 +414,13 @@ halfDayClockOut =
     </button>
 </div>
 
-<div style="
+            <div style="
     padding:16px;
 ">
 
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         <span>Buffer Used:</span>
-        <strong>${totalDeviation} min</strong>
+        <strong>${totalDeviation} days</strong>
     </div>
 
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
@@ -433,7 +458,7 @@ halfDayClockOut =
         <strong>${expectedClockOut}</strong>
     </div>
 
-    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         <span>Earliest Clock-Out:</span>
         <strong>${earliestClockOut}</strong>
     </div>
@@ -446,7 +471,7 @@ halfDayClockOut =
 
 </div>
 
-</div>
+        </div>
     `;
 
     document.body.appendChild(card);

@@ -1,5 +1,11 @@
 (function () {
 
+if (window.bufferCountdown) {
+    clearInterval(
+        window.bufferCountdown
+    );
+}
+
 const calendar =
     document.querySelector(
         "tbody.MyTbody"
@@ -41,6 +47,78 @@ const monthLabel =
             parseInt(m, 10)
         );
     }
+
+function startCountdown(expectedMinutes) {
+
+    const updateCountdown = () => {
+
+        const now = new Date();
+
+        const currentSeconds =
+            (now.getHours() * 3600) +
+            (now.getMinutes() * 60) +
+            now.getSeconds();
+
+        const expectedSeconds =
+            expectedMinutes * 60;
+
+        const remaining =
+            expectedSeconds -
+            currentSeconds;
+
+        const el =
+            document.getElementById(
+                "countdownTimer"
+            );
+
+        if (!el) return;
+
+        if (remaining <= 0) {
+el.style.color = "#16a34a"; // green
+    const overtime =
+        Math.abs(remaining);
+
+    const hrs =
+        Math.floor(overtime / 3600);
+
+    const mins =
+        Math.floor(
+            (overtime % 3600) / 60
+        );
+
+    const secs =
+        overtime % 60;
+
+    el.textContent =
+        `+${hrs}h ${mins}m ${secs}s`;
+
+    return;
+}
+
+        const hrs =
+            Math.floor(
+                remaining / 3600
+            );
+
+        const mins =
+            Math.floor(
+                (remaining % 3600) / 60
+            );
+
+        const secs =
+            remaining % 60;
+
+        el.textContent =
+            `${hrs}h ${mins}m ${secs}s`;
+    };
+
+    updateCountdown();
+
+    return setInterval(
+        updateCountdown,
+        1000
+    );
+}
 
     function format12Hour(minutes) {
 
@@ -235,7 +313,19 @@ const monthLabel =
         .replace(" ", "-");
 
 const calendarMatchesCurrentMonth =
+    monthLabel &&
     monthLabel === currentMonthYear;
+
+const historicalMonthMessage =
+    calendarMatchesCurrentMonth
+        ? ""
+        : `
+            <div style="
+                text-align:center;
+            ">
+                ${monthLabel}
+            </div>
+          `;
 
 let todayEntry = null;
 
@@ -263,13 +353,15 @@ if (calendarMatchesCurrentMonth) {
     let earliestClockOut =
         "--";
 
+let expectedMinutes = null;
+
 let halfDayClockOut = "--";
+
+let todayClockOut = "--";
 
     if (todayEntry) {
 
-        if (
-            !todayEntry.clockIn
-        ) {
+        if (!todayEntry.clockIn) {
 
             todayClockIn =
                 todayEntry.status ||
@@ -298,29 +390,96 @@ halfDayClockOut =
                     inMin
                 );
 
-            const expectedMinutes =
-                Math.max(
-                    inMin +
-                        540,
-                    17 * 60
-                );
+const actualClockOutMin =
+    timeToMinutes(
+        todayEntry.clockOut
+    );
 
-            expectedClockOut =
-                format12Hour(
-                    expectedMinutes
-                );
+if (
+    actualClockOutMin !== null
+) {
 
-            const usableBuffer =
-                Math.min(
-                    remainingBuffer,
-                    29
-                );
+    let adjustedOut =
+        actualClockOutMin;
 
-            earliestClockOut =
-                format12Hour(
-                    expectedMinutes -
-                        usableBuffer
-                );
+    if (
+        adjustedOut < inMin
+    ) {
+        adjustedOut += 1440;
+    }
+
+    const workedHours =
+        (
+            adjustedOut -
+            inMin
+        ) / 60;
+
+    if (
+        workedHours >= 8.5
+    ) {
+
+        todayClockOut =
+            format12Hour(
+                actualClockOutMin
+            );
+
+        expectedClockOut = "--";
+        earliestClockOut = "--";
+        halfDayClockOut = "--";
+        expectedMinutes = null;
+
+    } else {
+
+        // Still working
+        todayClockOut = "--";
+    }
+}
+            if (
+    todayEntry.clockOut &&
+    todayEntry.clockOut.trim() !== ""
+) {
+
+    expectedClockOut = "--";
+    earliestClockOut = "--";
+    halfDayClockOut = "--";
+    expectedMinutes = null;
+
+} else {
+
+    expectedMinutes =
+        Math.max(
+            inMin + 540,
+            17 * 60
+        );
+
+    const effectiveClockIn =
+        Math.max(
+            inMin,
+            8 * 60
+        );
+
+    halfDayClockOut =
+        format12Hour(
+            effectiveClockIn + 270
+        );
+
+    expectedClockOut =
+        format12Hour(
+            expectedMinutes
+        );
+
+    const usableBuffer =
+        Math.min(
+            remainingBuffer,
+            29
+        );
+
+    earliestClockOut =
+        format12Hour(
+            expectedMinutes -
+            usableBuffer
+        );
+}
         }
     }
 
@@ -381,7 +540,7 @@ halfDayClockOut =
                 <span>
                     Buffer Dashboard
                 </span>
-
+${historicalMonthMessage}
                 <span
                     style="
                         cursor:pointer
@@ -397,6 +556,7 @@ halfDayClockOut =
                     ✕
                 </span>
             </div>
+
 <div style="padding:12px;">
     <button id="downloadBufferDashboard"
         style="
@@ -419,7 +579,7 @@ halfDayClockOut =
 ">
 
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-        <span>Buffer Used:</span>
+        <span>Total Deviation:</span>
         <strong>${totalDeviation} min</strong>
     </div>
 
@@ -452,22 +612,32 @@ halfDayClockOut =
         <span>Today's Clock-In:</span>
         <strong>${todayClockIn}</strong>
     </div>
+<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+    <span>Today's Clock-Out:</span>
+    <strong>${todayClockOut}</strong>
+</div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Half-Day Clock-Out:</span>
+        <strong>${halfDayClockOut}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span>Earliest Clock-Out:</span>
+        <strong>${earliestClockOut}</strong>
+    </div>
 
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         <span>Expected Clock-Out:</span>
         <strong>${expectedClockOut}</strong>
     </div>
 
-<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-        <span>Earliest Clock-Out:</span>
-        <strong>${earliestClockOut}</strong>
-    </div>
+<div style="display:flex;justify-content:space-between;">
+    <span>Time Until Expected Out:</span>
+    <strong id="countdownTimer">--</strong>
+</div>
 
 
-    <div style="display:flex;justify-content:space-between;">
-        <span>Half-Day Clock-Out:</span>
-        <strong>${halfDayClockOut}</strong>
-    </div>
+
+    
 
 </div>
 
@@ -475,6 +645,15 @@ halfDayClockOut =
     `;
 
     document.body.appendChild(card);
+if (
+    expectedMinutes !== null &&
+    calendarMatchesCurrentMonth
+) {
+    window.bufferCountdown =
+    startCountdown(
+        expectedMinutes
+    );
+}
 document
     .getElementById("downloadBufferDashboard")
     .addEventListener("click", () => {

@@ -8,13 +8,13 @@ if (window.bufferCountdown) {
 
 const calendar =
     document.querySelector(
-        "tbody.MyTbody"
+        ".react-calendar"
     );
 
 if (!calendar) {
 
     alert(
-        "Buffer Dashboard can only be used on the Samay Homepage."
+        "Buffer Dashboard can only be used on the WelPro Homepage. Click Calendar Icon next to Today's clock-in then run again"
     );
 
     return;
@@ -22,10 +22,11 @@ if (!calendar) {
 
 const monthLabel =
     document
-        .getElementById("lbl")
+        .querySelector(
+            ".react-calendar__navigation__label__labelText"
+        )
         ?.textContent
         ?.trim();
-
     const existing =
         document.getElementById(
             "buffer-dashboard"
@@ -153,54 +154,58 @@ el.style.color = "#16a34a"; // green
     const entries = [];
 
     document
-        .querySelectorAll(
-            "td[class*='current-']"
-        )
-        .forEach(cell => {
+    .querySelectorAll(
+        ".react-calendar__month-view__days .react-calendar__tile"
+    )
+        .forEach(tile => {
 
-            const clockIn =
-                cell.querySelector(
-                    ".clock-in .tooltip"
-                )
+    const date =
+        parseInt(
+            tile
+                .querySelector("abbr")
                 ?.textContent
-                ?.trim();
+                ?.trim(),
+            10
+        );
 
-            const clockOut =
-                cell.querySelector(
-                    ".clock-out .tooltip"
-                )
-                ?.textContent
-                ?.trim();
+    const clockIn =
+        tile
+            .querySelector(".checkInTime")
+            ?.textContent
+            ?.trim();
 
-            const status =
-                cell.querySelector(
-                    ".status .tooltip"
-                )
-                ?.textContent
-                ?.trim();
+    const clockOut =
+        tile
+            .querySelector(".checkOutTime")
+            ?.textContent
+            ?.trim();
 
-            const dateText =
-                cell.querySelector(
-                    ".date .tooltip"
-                )
-                ?.textContent
-                ?.trim();
+    const status =
+        tile
+            .querySelector(".status")
+            ?.textContent
+            ?.trim();
 
-            if (!dateText) return;
+    const hoursWorked =
+        tile
+            .querySelector(".dayHours")
+            ?.textContent
+            ?.trim();
 
-            entries.push({
-                date:
-                    parseInt(
-                        dateText,
-                        10
-                    ),
-                clockIn,
-                clockOut,
-                status,
-                cellClass:
-                    cell.className
-            });
-        });
+    entries.push({
+        date,
+        clockIn,
+        clockOut,
+        status,
+        hoursWorked,
+        tileClass:
+            tile.className,
+        isToday:
+            tile.classList.contains(
+                "react-calendar__tile--now"
+            )
+    });
+});
 
     const attendanceEntries =
         entries.filter(
@@ -309,8 +314,7 @@ el.style.color = "#16a34a"; // green
                 month: "long",
                 year: "numeric"
             }
-        )
-        .replace(" ", "-");
+        );
 
 const calendarMatchesCurrentMonth =
     monthLabel &&
@@ -331,16 +335,10 @@ let todayEntry = null;
 
 if (calendarMatchesCurrentMonth) {
 
-    const todayDay =
-        new Date()
-            .getDate();
-
     todayEntry =
-        entries.find(
-            e =>
-                e.date ===
-                todayDay
-        );
+    entries.find(
+        e => e.isToday
+    );
 }
 
            
@@ -373,7 +371,6 @@ let todayClockOut = "--";
                 timeToMinutes(
                     todayEntry.clockIn
                 );
-
 const effectiveClockIn =
     Math.max(
         inMin,
@@ -434,28 +431,14 @@ if (
         todayClockOut = "--";
     }
 }
-            if (
-    todayEntry.clockOut &&
-    todayEntry.clockOut.trim() !== ""
-) {
+            
 
-    expectedClockOut = "--";
-    earliestClockOut = "--";
-    halfDayClockOut = "--";
-    expectedMinutes = null;
-
-} else {
+if (todayClockOut === "--") {
 
     expectedMinutes =
         Math.max(
             inMin + 540,
             17 * 60
-        );
-
-    const effectiveClockIn =
-        Math.max(
-            inMin,
-            8 * 60
         );
 
     halfDayClockOut =
@@ -471,7 +454,7 @@ if (
     const usableBuffer =
         Math.min(
             remainingBuffer,
-            29
+            30
         );
 
     earliestClockOut =

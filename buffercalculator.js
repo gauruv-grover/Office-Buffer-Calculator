@@ -1,24 +1,46 @@
 (function () {
 
-if (window.bufferCountdown) {
-    clearInterval(
-        window.bufferCountdown
-    );
-}
-
-const calendar =
+const calendarIcon =
     document.querySelector(
-        ".react-calendar"
+        '[data-testid="CalendarMonthIcon"]'
     );
 
-if (!calendar) {
+if (!calendarIcon) {
 
     alert(
-        "Buffer Dashboard can only be used on the WelPro Homepage. Click Calendar Icon next to Today's clock-in then run again"
+        "Calendar icon not found."
     );
 
     return;
 }
+
+calendarIcon.dispatchEvent(
+    new MouseEvent(
+        "click",
+        {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        }
+    )
+);
+
+const waitForCalendar = setInterval(() => {
+
+    const calendar =
+        document.querySelector(
+            ".react-calendar"
+        );
+
+    if (calendar) {
+
+        clearInterval(
+            waitForCalendar
+        );
+
+        // extract calendar data
+
+
 
 const monthLabel =
     document
@@ -693,5 +715,9 @@ Half-Day Clock-Out    : ${halfDayClockOut}
 
         URL.revokeObjectURL(url);
     });
+
+}
+}, 100);
+
 
 })();

@@ -8,7 +8,7 @@ const calendarIcon =
 if (!calendarIcon) {
 
     alert(
-        "Calendar icon not found."
+        "Please go to WelPro Home Page and try again"
     );
 
     return;
@@ -718,6 +718,29 @@ Half-Day Clock-Out    : ${halfDayClockOut}
 
 }
 }, 100);
+
+setTimeout(() => {
+
+    const closeButton =
+        document.querySelector(
+            '[data-testid="CloseIcon"]'
+        );
+
+    if (closeButton) {
+
+        closeButton.dispatchEvent(
+            new MouseEvent(
+                "click",
+                {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                }
+            )
+        );
+    }
+
+}, 1000);
 
 
 })();

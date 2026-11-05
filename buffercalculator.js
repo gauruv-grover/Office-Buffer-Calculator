@@ -632,7 +632,7 @@ ${todayMessage}
         </div>
     `;
 document.body.appendChild(card);
-setTimeout(() => {
+//setTimeout(() => {
 
 const closeButton =
     document.querySelector(
@@ -652,7 +652,7 @@ if (closeButton) {
     );
 }
 
-}, 100);
+//}, 100);
 
 if (
     expectedMinutes !== null &&
@@ -722,7 +722,7 @@ Half-Day Clock-Out    : ${halfDayClockOut}
     });
 
 }
-}, 100);
+}, 0);
 
 
 

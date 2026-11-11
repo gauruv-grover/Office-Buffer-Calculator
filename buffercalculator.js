@@ -240,6 +240,7 @@
                         let totalDeviation = 0;
                         let bufferCountUsed = 0;
                         let maxBufferTaken = 0;
+                      	let pendingIntimation = 0;
 
                         attendanceEntries.forEach(
                             day => {
@@ -293,7 +294,10 @@
                                         deviation;
 
                                     bufferCountUsed++;
-
+                                  
+                                  	if(day.status === "P/2") {
+                                      pendingIntimation++;
+                                    }
                                     if (
                                         deviation >
                                         maxBufferTaken
@@ -370,6 +374,8 @@ let halfDayClockOut = "--";
 let todayClockOut = "--";
 
 var todayMessage = "";
+                      
+var pendingIntimationMessage = "";
 
 if (todayEntry) {
     if (!todayEntry.clockIn) {
@@ -452,6 +458,15 @@ todayMessage =
                     <strong>${todayClockIn}</strong>
                 </div>
 `;
+      
+      if(pendingIntimation > 0) {
+        pendingIntimationMessage = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        	<span>Pending Intimation:</span>
+            <strong class="text-danger">${pendingIntimation} days</strong>
+        </div>
+                `;
+      }
 
 
         if (todayClockOut === "--") {
@@ -611,6 +626,8 @@ padding-right:5px;
                     <span>Buffer Events Used:</span>
                     <strong>${bufferCountUsed} days</strong>
                 </div>
+
+				${pendingIntimationMessage}
 
                 <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
                     <span>Buffer Events Remaining:</span>

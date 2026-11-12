@@ -566,18 +566,26 @@ card.id =
     "buffer-dashboard";
 
 card.innerHTML = `
-                <div style="
-            position:fixed;
-            top:70px;
-            right:20px;
-            width:360px;
-            background:white;
-            border-radius:12px;
-            box-shadow:0 8px 24px rgba(0,0,0,.25);
-            z-index:999999;
-            font-family:'Segoe UI';
-            overflow:hidden;
-        ">
+                <div id="bufferBackdrop" style="
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.15);
+    z-index:999998;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+">
+
+<div id="bufferModal" style="
+    width:min(420px,90vw);
+    background:white;
+    border-radius:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,.05);
+    font-family:'Segoe UI';
+    overflow:hidden;
+    max-height:85vh;
+    overflow-y:auto;
+">
             <div style="
                 background:#160b8b;
                 color:white;
@@ -596,17 +604,6 @@ card.innerHTML = `
 padding-right:5px;
                 ">
                     <i class="fa-solid fa-download"></i>
-                </span>
-                <span style="
-                        cursor:pointer
-                    " onclick="
-                        document
-                        .getElementById(
-                        'buffer-dashboard'
-                        )
-                        .remove();
-                    ">
-                    ✕
                 </span>
 </div>
             </div>
@@ -650,6 +647,37 @@ ${todayMessage}
     `;
 document.body.appendChild(card);
 //setTimeout(() => {
+                      
+                      const backdrop =
+    document.getElementById(
+        "bufferBackdrop"
+    );
+
+const modal =
+    document.getElementById(
+        "bufferModal"
+    );
+
+backdrop.addEventListener(
+    "click",
+    () => {
+
+        if (window.bufferCountdown) {
+            clearInterval(
+                window.bufferCountdown
+            );
+        }
+
+        card.remove();
+    }
+);
+
+modal.addEventListener(
+    "click",
+    (e) => {
+        e.stopPropagation();
+    }
+);
 
 const closeButton =
     document.querySelector(

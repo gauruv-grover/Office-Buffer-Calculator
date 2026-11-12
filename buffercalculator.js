@@ -593,10 +593,12 @@ card.innerHTML = `
                 #160b8b,
                 #2617c9);
                 color:white;
-                padding:14px 18px;
+                padding:10px 18px;
                 font-size:large;
+                font-weight: 900;
                 display:flex;
                 justify-content:space-between;
+                align-items:center;
             ">
                 <span>
                     Buffer Dashboard 
@@ -606,8 +608,6 @@ card.innerHTML = `
         	background:rgba(255,255,255,.18);
         	padding:4px 10px;
         	border-radius:999px;
-        	font-size:12px;
-        	font-weight:600;
       	">
       </span>
 <!--                <div class="d-flex justify-content-end">

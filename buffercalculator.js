@@ -595,7 +595,7 @@ card.innerHTML = `
                 color:white;
                 padding:10px 18px;
                 font-size:large;
-                font-weight: 900;
+                font-weight: 600;
                 display:flex;
                 justify-content:space-between;
                 align-items:center;

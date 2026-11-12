@@ -113,9 +113,19 @@
                                     const secs =
                                         overtime % 60;
 
-                                    el.textContent =
-                                        `+${hrs}h ${mins}m ${secs}s`;
+									el.textContent = `+`;
+									
+									if(hrs>0){
+										el.textContent += `${hrs}h`;
+									}
 
+									if(mins>0){
+										el.textContent += ` ${mins}m`;
+									}
+									
+									if(secs>0){
+										el.textContent += ` ${secs}m`;
+									}
                                     return;
                                 }
 
@@ -132,10 +142,21 @@
                                 const secs =
                                     remaining % 60;
 
-				el.style.color = "";
+								el.style.color = "";
+								el.textContent = ``;
+									
+								if(hrs>0){
+									el.textContent += `${hrs}h`;
+								}
 
-                                el.textContent =
-                                    `${hrs}h ${mins}m ${secs}s`;
+								if(mins>0){
+									el.textContent += ` ${mins}m`;
+								}
+								
+								if(secs>0){
+									el.textContent += ` ${secs}m`;
+								}
+                                
                             };
 
                             updateCountdown();

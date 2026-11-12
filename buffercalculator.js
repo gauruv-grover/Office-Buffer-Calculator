@@ -566,30 +566,31 @@ card.id =
     "buffer-dashboard";
 
 card.innerHTML = `
-                <div id="bufferBackdrop" style="
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.15);
-    z-index:999998;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-">
-
-<div id="bufferModal" style="
-    width:min(420px,90vw);
-    background:white;
-    border-radius:12px;
-    box-shadow:0 8px 24px rgba(0,0,0,.05);
-    font-family:'Segoe UI';
-    overflow:hidden;
-    max-height:85vh;
-    overflow-y:auto;
-">
+                <div style="
+            position:fixed;
+            top:90px;
+            right:24px;
+            width:380px;
+            background:white;
+            border-radius:16px;
+            box-shadow:0 12px 32px rgba(0,0,0,.12), 0 3px 8px rgba(0,0,0,.08);
+            z-index:999999;
+            
+            overflow:hidden;transition:transform .2s ease, box-shadow .2s ease;
+            "
+			onmouseover="
+    			this.style.transform='translateY(-2px)';
+    			this.style.boxShadow='0 16px 40px rgba(0,0,0,.22)';
+			"
+			onmouseout="
+    			this.style.transform='translateY(0)';
+    			this.style.boxShadow='0 12px 32px rgba(0,0,0,.18)';
+				"
+        >
             <div style="
                 background:#160b8b;
                 color:white;
-                padding:12px 16px;
+                padding:14px 18px;
                 font-weight:bold;
                 display:flex;
                 justify-content:space-between;
@@ -605,10 +606,21 @@ padding-right:5px;
                 ">
                     <i class="fa-solid fa-download"></i>
                 </span>
+                <span style="
+                        cursor:pointer
+                    " onclick="
+                        document
+                        .getElementById(
+                        'buffer-dashboard'
+                        )
+                        .remove();
+                    ">
+                    ✕
+                </span>
 </div>
             </div>
 
-            <div style="padding:16px;">
+            <div style="padding:18px;">
                 <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
                     <span>Total Deviation:</span>
                     <strong>${totalDeviation} min</strong>
@@ -647,38 +659,53 @@ ${todayMessage}
     `;
 document.body.appendChild(card);
 //setTimeout(() => {
-                      
-                      const backdrop =
-    document.getElementById(
-        "bufferBackdrop"
-    );
+setTimeout(() => {
 
-const modal =
-    document.getElementById(
-        "bufferModal"
-    );
+    function closeDashboard(e) {
 
-backdrop.addEventListener(
-    "click",
-    () => {
-
-        if (window.bufferCountdown) {
-            clearInterval(
-                window.bufferCountdown
+        const dashboard =
+            document.getElementById(
+                "buffer-dashboard"
             );
+
+        if (!dashboard) {
+            document.removeEventListener(
+                "click",
+                closeDashboard
+            );
+            return;
         }
 
-        card.remove();
-    }
-);
+        if (
+            !dashboard.contains(
+                e.target
+            )
+        ) {
 
-modal.addEventListener(
-    "click",
-    (e) => {
-        e.stopPropagation();
-    }
-);
+            if (
+                window.bufferCountdown
+            ) {
+                clearInterval(
+                    window.bufferCountdown
+                );
+            }
 
+            dashboard.remove();
+
+            document.removeEventListener(
+                "click",
+                closeDashboard
+            );
+        }
+    }
+
+    document.addEventListener(
+        "click",
+        closeDashboard
+    );
+
+}, 0);
+                      
 const closeButton =
     document.querySelector(
         '[data-testid="CloseIcon"]'

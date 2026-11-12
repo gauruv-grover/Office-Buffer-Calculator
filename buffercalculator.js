@@ -110,21 +110,26 @@
                                             (overtime % 3600) / 60
                                         );
 
-                                    const secs =
+                                    var secs =
                                         overtime % 60;
+									if(secs<10){
+										secs = '0' + secs;
+									}
 
 									el.textContent = `+`;
 									
 									if(hrs>0){
-										el.textContent += `${hrs}h`;
+										el.textContent = `${hrs}h ${mins}m ${secs}s`;
 									}
 
-									if(mins>0){
-										el.textContent += ` ${mins}m`;
+									else if(mins>0){
+										el.textContent = ` ${mins}m ${secs}s`;
 									}
 									
+									else{
+										el.textContent = ` ${secs}s`;	
+									}
 									
-									el.textContent += ` ${secs}s`;
 									
                                     return;
                                 }
@@ -139,21 +144,26 @@
                                         (remaining % 3600) / 60
                                     );
 
-                                const secs =
+                                var secs =
                                     remaining % 60;
 
 								el.style.color = "";
 								el.textContent = ``;
+								if(secs<10){
+									secs = '0' + secs;
+								}
 									
 								if(hrs>0){
-									el.textContent += `${hrs}h`;
+									el.textContent = `${hrs}h ${mins}m ${secs}s`;
 								}
 
-								if(mins>0){
-									el.textContent += ` ${mins}m`;
+								else if(mins>0){
+									el.textContent = ` ${mins}m ${secs}s`;
 								}
 								
-								el.textContent += ` ${secs}s`;
+								else{
+									el.textContent = ` ${secs}s`;	
+								}
 								
                                 
                             };

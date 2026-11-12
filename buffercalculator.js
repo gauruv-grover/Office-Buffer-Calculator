@@ -123,9 +123,9 @@
 										el.textContent += ` ${mins}m`;
 									}
 									
-									if(secs>0){
-										el.textContent += ` ${secs}m`;
-									}
+									
+									el.textContent += ` ${secs}s`;
+									
                                     return;
                                 }
 
@@ -153,9 +153,8 @@
 									el.textContent += ` ${mins}m`;
 								}
 								
-								if(secs>0){
-									el.textContent += ` ${secs}m`;
-								}
+								el.textContent += ` ${secs}s`;
+								
                                 
                             };
 

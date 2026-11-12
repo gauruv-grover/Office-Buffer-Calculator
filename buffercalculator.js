@@ -573,7 +573,8 @@ card.innerHTML = `
             width:380px;
             background:white;
             border-radius:16px;
-            box-shadow:0 12px 32px rgba(0,0,0,.12), 0 3px 8px rgba(0,0,0,.08);
+            box-shadow:
+    inset 0 -1px 0 rgba(255,255,255,.12);
             z-index:999999;
             
             overflow:hidden;transition:transform .2s ease, box-shadow .2s ease;
@@ -588,25 +589,36 @@ card.innerHTML = `
 				"
         >
             <div style="
-                background:#160b8b;
+                background:linear-gradient(
+                135deg,
+                #160b8b,
+                #2617c9);
                 color:white;
                 padding:14px 18px;
-                font-weight:bold;
+                font-size:large;
                 display:flex;
                 justify-content:space-between;
             ">
                 <span>
                     Buffer Dashboard 
                 </span>
-		<span id="countdownTimer"></span>
-                <div class="d-flex justify-content-end">
+		<span id="countdownTimer"
+      		style="
+        	background:rgba(255,255,255,.18);
+        	padding:4px 10px;
+        	border-radius:999px;
+        	font-size:12px;
+        	font-weight:600;
+      	">
+      </span>
+<!--                <div class="d-flex justify-content-end">
                 <span id="downloadBufferDashboard" style="
                     cursor:pointer;
 padding-right:5px;
                 ">
                     <i class="fa-solid fa-download"></i>
                 </span>
-</div>
+</div>-->
             </div>
 
             <div style="padding:18px;">
@@ -724,63 +736,63 @@ if (
             expectedMinutes
         );
 }
-document
-    .getElementById("downloadBufferDashboard")
-    .addEventListener("click", () => {
+// document
+//     .getElementById("downloadBufferDashboard")
+//     .addEventListener("click", () => {
 
-        const content = `
-BUFFER DASHBOARD
-================
+//         const content = `
+// BUFFER DASHBOARD
+// ================
 
-Total Deviation       : ${totalDeviation} min
-Remaining Buffer      : ${remainingBuffer} min
+// Total Deviation       : ${totalDeviation} min
+// Remaining Buffer      : ${remainingBuffer} min
 
-Buffer Events Used    : ${bufferCountUsed} days
-Buffer Events Remaining : ${bufferRemaining} days
+// Buffer Events Used    : ${bufferCountUsed} days
+// Buffer Events Remaining : ${bufferRemaining} days
 
-Buffer Resets In      : ${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}
+// Buffer Resets In      : ${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}
 
-Today's Clock-In      : ${todayClockIn}
-Expected Clock-Out    : ${expectedClockOut}
-Earliest Clock-Out    : ${earliestClockOut}
-Half-Day Clock-Out    : ${halfDayClockOut}
-`.trim();
+// Today's Clock-In      : ${todayClockIn}
+// Expected Clock-Out    : ${expectedClockOut}
+// Earliest Clock-Out    : ${earliestClockOut}
+// Half-Day Clock-Out    : ${halfDayClockOut}
+// `.trim();
 
-        const blob = new Blob(
-            [content], {
-                type: "text/plain"
-            }
-        );
+//         const blob = new Blob(
+//             [content], {
+//                 type: "text/plain"
+//             }
+//         );
 
-        const url =
-            URL.createObjectURL(blob);
+//         const url =
+//             URL.createObjectURL(blob);
 
-        const a =
-            document.createElement("a");
+//         const a =
+//             document.createElement("a");
 
-        const today =
-            new Date();
+//         const today =
+//             new Date();
 
-        const dateString =
-            today.getFullYear() +
-            "-" +
-            String(today.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(today.getDate()).padStart(2, "0");
+//         const dateString =
+//             today.getFullYear() +
+//             "-" +
+//             String(today.getMonth() + 1).padStart(2, "0") +
+//             "-" +
+//             String(today.getDate()).padStart(2, "0");
 
-        a.href = url;
+//         a.href = url;
 
-        a.download =
-            `BufferDashboard-${dateString}.txt`;
+//         a.download =
+//             `BufferDashboard-${dateString}.txt`;
 
-        document.body.appendChild(a);
+//         document.body.appendChild(a);
 
-        a.click();
+//         a.click();
 
-        a.remove();
+//         a.remove();
 
-        URL.revokeObjectURL(url);
-    });
+//         URL.revokeObjectURL(url);
+//     });
 
 }
 }, 0);

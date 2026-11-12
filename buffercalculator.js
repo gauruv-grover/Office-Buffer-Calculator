@@ -606,17 +606,6 @@ padding-right:5px;
                 ">
                     <i class="fa-solid fa-download"></i>
                 </span>
-                <span style="
-                        cursor:pointer
-                    " onclick="
-                        document
-                        .getElementById(
-                        'buffer-dashboard'
-                        )
-                        .remove();
-                    ">
-                    ✕
-                </span>
 </div>
             </div>
 

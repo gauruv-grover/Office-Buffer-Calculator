@@ -573,8 +573,7 @@ card.innerHTML = `
             width:380px;
             background:white;
             border-radius:16px;
-            box-shadow:
-    inset 0 -1px 0 rgba(255,255,255,.12);
+            box-shadow:'0 12px 32px rgba(0,0,0,.18)';
             z-index:999999;
             
             overflow:hidden;transition:transform .2s ease, box-shadow .2s ease;

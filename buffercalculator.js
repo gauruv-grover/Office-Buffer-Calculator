@@ -610,11 +610,11 @@ card.innerHTML = `
             "
 			onmouseover="
     			this.style.transform='translateY(-2px)';
-    			this.style.boxShadow='0 16px 40px rgba(0,0,0,.22)';
+    			this.style.boxShadow='0 16px 40px rgba(0,0,255,.40)';
 			"
 			onmouseout="
     			this.style.transform='translateY(0)';
-    			this.style.boxShadow='0 12px 32px rgba(0,0,0,.18)';
+    			this.style.boxShadow='0 12px 32px rgba(0,0,255,.18)';
 				"
         >
             <div style="

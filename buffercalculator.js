@@ -137,14 +137,8 @@
 						        currentSeconds;
 						
 						    if (remaining <= 0) {
-						
-						        el.style.color =
-						        overtimeColor;
-						
-						    el.style.fontWeight =
-						        "700";
-						
-						    el.textContent = "READY";
+						el.innerHTML =
+    '<i class="fas fa-person-walking-dashed-line-arrow-right" style="color:#198754;font-size:16px;"></i>';
 						
 						    return;
 						    }

@@ -72,109 +72,103 @@
                             );
                         }
 
-                        function startCountdown(expectedMinutes) {
+                        function startCountdown(
+						    earliestMinutes,
+						    expectedMinutes,
+							halfDayMinutes
+						) {
+						
+						    const updateCountdown = () => {
+						
+						        const now = new Date();
+						
+						        const currentSeconds =
+						            (now.getHours() * 3600) +
+						            (now.getMinutes() * 60) +
+						            now.getSeconds();
+						
+						        updateSingle(
+						            "earliestCountdownTimer",
+						            earliestMinutes * 60,
+						            currentSeconds,
+						            "#006400",
+						            ""
+						        );
+						
+						        updateSingle(
+						            "expectedCountdownTimer",
+						            expectedMinutes * 60,
+						            currentSeconds,
+						            "#006400",
+						            ""
+						        );
 
-                            const updateCountdown = () => {
-
-                                const now = new Date();
-
-                                const currentSeconds =
-                                    (now.getHours() * 3600) +
-                                    (now.getMinutes() * 60) +
-                                    now.getSeconds();
-
-                                const expectedSeconds =
-                                    expectedMinutes * 60;
-
-                                const remaining =
-                                    expectedSeconds -
-                                    currentSeconds;
-
-                                const el =
-                                    document.getElementById(
-                                        "countdownTimer"
-                                    );
-
-                                if (!el) return;
-
-                                if (remaining <= 0) {
-                                    el.style.color = "#16a34a"; // green
-                                    const overtime =
-                                        Math.abs(remaining);
-
-                                    const hrs =
-                                        Math.floor(overtime / 3600);
-
-                                    const mins =
-                                        Math.floor(
-                                            (overtime % 3600) / 60
-                                        );
-
-                                    var secs =
-                                        overtime % 60;
-									if(secs<10){
-										secs = '0' + secs;
-									}
-
-									el.textContent = `+`;
-									
-									if(hrs>0){
-										el.textContent = `${hrs}h ${mins}m ${secs}s`;
-									}
-
-									else if(mins>0){
-										el.textContent = ` ${mins}m ${secs}s`;
-									}
-									
-									else{
-										el.textContent = ` ${secs}s`;	
-									}
-									
-									
-                                    return;
-                                }
-
-                                const hrs =
-                                    Math.floor(
-                                        remaining / 3600
-                                    );
-
-                                const mins =
-                                    Math.floor(
-                                        (remaining % 3600) / 60
-                                    );
-
-                                var secs =
-                                    remaining % 60;
-
-								el.style.color = "";
-								el.textContent = ``;
-								if(secs<10){
-									secs = '0' + secs;
-								}
-									
-								if(hrs>0){
-									el.textContent = `${hrs}h ${mins}m ${secs}s`;
-								}
-
-								else if(mins>0){
-									el.textContent = ` ${mins}m ${secs}s`;
-								}
-								
-								else{
-									el.textContent = ` ${secs}s`;	
-								}
-								
-                                
-                            };
-
-                            updateCountdown();
-
-                            return setInterval(
-                                updateCountdown,
-                                1000
-                            );
-                        }
+								updateSingle(
+						            "halfDayCountdownTimer",
+						            halfDayMinutes * 60,
+						            currentSeconds,
+						            "#006400",
+						            ""
+						        );
+						    };
+						
+						    updateCountdown();
+						
+						    return setInterval(
+						        updateCountdown,
+						        1000
+						    );
+						}
+						function updateSingle(
+						    id,
+						    targetSeconds,
+						    currentSeconds,
+						    overtimeColor,
+						    label
+						) {
+						
+						    const el =
+						        document.getElementById(id);
+						
+						    if (!el) return;
+						
+						    const remaining =
+						        targetSeconds -
+						        currentSeconds;
+						
+						    if (remaining <= 0) {
+						
+						        el.style.color =
+						        overtimeColor;
+						
+						    el.style.fontWeight =
+						        "700";
+						
+						    el.textContent = "READY";
+						
+						    return;
+						    }
+						
+						    const hrs =
+						        Math.floor(
+						            remaining / 3600
+						        );
+						
+						    const mins =
+						        Math.floor(
+						            (remaining % 3600) / 60
+						        );
+						
+						    const secs =
+						        remaining % 60;
+						
+						    el.textContent =
+						        `${label} ${hrs}:${mins
+						            .toString()
+						            .padStart(2, "0")}:${secs
+						            .toString()
+						            .padStart(2, "0")}`;
+						}
 
                         function format12Hour(minutes) {
 
@@ -398,6 +392,8 @@ let earliestClockOut =
     "--";
 
 let expectedMinutes = null;
+let earliestMinutes = null;
+let halfDayMinutes = null;
 
 let halfDayClockOut = "--";
 
@@ -426,10 +422,13 @@ if (todayEntry) {
                 8 * 60
             );
 
-        halfDayClockOut =
-            format12Hour(
-                effectiveClockIn + 270
-            );
+       halfDayMinutes =
+		    effectiveClockIn + 270;
+		
+		halfDayClockOut =
+		    format12Hour(
+		        halfDayMinutes
+		    );
 
         todayClockIn =
             format12Hour(
@@ -523,31 +522,33 @@ todayMessage =
                     30
                 );
 
-            earliestClockOut =
-                format12Hour(
-                    expectedMinutes -
-                    usableBuffer
-                );
-todayMessage +=
+			earliestMinutes =
+				expectedMinutes -
+				usableBuffer;
+			 
+			earliestClockOut =
+				format12Hour(
+				earliestMinutes
+				);
+			todayMessage +=
                 `
-                <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-                    <span>Half-Day Clock-Out:</span>
-                    <strong>${halfDayClockOut}</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-                    <span>Earliest Clock-Out:</span>
-                    <strong>${earliestClockOut}</strong>
-                </div>
-
-                <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-                    <span>Expected Clock-Out:</span>
-                    <strong>${expectedClockOut}</strong>
-                </div>
-
-                <!--<div style="display:flex;justify-content:space-between;">
-                    <span>Time Until Expected Out:</span>
-                    <strong id="countdownTimer">--</strong>
-                </div>-->
+                <div style="display:flex;align-items:center;margin-bottom:10px;">
+				    <span style="width:160px;">Half-Day Clock-Out:</span>
+				    <span id="halfDayCountdownTimer" style="flex:1;text-align:right;"></span>
+				    <strong style="width:80px;text-align:right;">${halfDayClockOut}</strong>
+				</div>
+				
+				<div style="display:flex;align-items:center;margin-bottom:10px;">
+				    <span style="width:160px;">Earliest Clock-Out:</span>
+				    <span id="earliestCountdownTimer" style="flex:1;text-align:right;"></span>
+				    <strong style="width:80px;text-align:right;">${earliestClockOut}</strong>
+				</div>
+				
+				<div style="display:flex;align-items:center;margin-bottom:10px;">
+				    <span style="width:160px;">Expected Clock-Out:</span>
+				    <span id="expectedCountdownTimer" style="flex:1;text-align:right;"></span>
+				    <strong style="width:80px;text-align:right;">${expectedClockOut}</strong>
+				</div>
 `;
         }
 else {
@@ -633,13 +634,28 @@ card.innerHTML = `
                 <span>
                     Buffer Dashboard 
                 </span>
-		<span id="countdownTimer"
-      		style="
-        	background:rgba(255,255,255,.18);
-        	padding:4px 10px;
-        	border-radius:999px;
-      	">
-      </span>
+		<!--<div style="
+		display:flex;
+		gap:6px;
+		font-size:12px;
+        background:rgba(255,255,255,.18);
+        padding:4px 10px;
+        border-radius:999px;
+		">
+		
+		<span id="earliestCountdownTimer"></span>
+		</div>
+		<div style="
+		display:flex;
+		gap:6px;
+		font-size:12px;
+        background:rgba(255,255,255,.18);
+        padding:4px 10px;
+        border-radius:999px;
+		">
+		<span id="expectedCountdownTimer"></span>
+		
+		</div>-->
 <!--                <div class="d-flex justify-content-end">
                 <span id="downloadBufferDashboard" style="
                     cursor:pointer;
@@ -719,6 +735,7 @@ setTimeout(() => {
                     window.bufferCountdown
                 );
             }
+			window.bufferCountdown = null;
 
             dashboard.remove();
 
@@ -762,7 +779,9 @@ if (
 ) {
     window.bufferCountdown =
         startCountdown(
-            expectedMinutes
+			earliestMinutes,
+            expectedMinutes,
+			halfDayMinutes
         );
 }
 // document

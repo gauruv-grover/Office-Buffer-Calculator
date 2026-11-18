@@ -475,7 +475,11 @@ if (todayEntry) {
         }
 
 todayMessage =
-                `
+                `<div style="
+				        border-top:1px solid #ddd;
+				        margin:12px 0;
+				 "></div>
+
                             <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
                     <span>Today's Clock-In:</span>
                     <strong>${todayClockIn}</strong>
@@ -688,10 +692,6 @@ padding-right:5px;
                     <strong>${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}</strong>
                 </div>
 
-                <div style="
-        border-top:1px solid #ddd;
-        margin:12px 0;
-    "></div>
 ${todayMessage}
             </div>
 

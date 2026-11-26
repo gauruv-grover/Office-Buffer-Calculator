@@ -255,6 +255,13 @@
                                 e.clockOut
                             );
 
+						const attendanceExceptions =
+						    entries.filter(
+						        e =>
+									(!e.isToday) &&
+						            e.status === "A"
+						    ).length;
+
                         let totalDeviation = 0;
                         let bufferCountUsed = 0;
                         let maxBufferTaken = 0;
@@ -396,6 +403,7 @@ let todayClockOut = "--";
 var todayMessage = "";
                       
 var pendingIntimationMessage = "";
+var attendanceExceptionsMessage = "";
 
 if (todayEntry) {
     if (!todayEntry.clockIn) {
@@ -490,10 +498,22 @@ todayMessage =
         pendingIntimationMessage = `
         <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         	<span>Pending Intimation:</span>
-            <strong class="text-danger">${pendingIntimation} days</strong>
+            <strong class="text-danger">${pendingIntimation} day${pendingIntimation !== 1 ? 's' : ''}
+			</strong>
         </div>
                 `;
       }
+
+		if(attendanceExceptions>0){
+		attendanceExceptionsMessage =
+		`
+		<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+		    <span>Pending Regularization:</span>
+		    <strong class="text-danger">${attendanceExceptions} day${attendanceExceptions !== 1 ? 's' : ''}
+		    </strong>
+		</div>
+		`;
+		}
 
 
         if (todayClockOut === "--") {
@@ -679,9 +699,7 @@ padding-right:5px;
                     <span>Buffer Events Used:</span>
                     <strong>${bufferCountUsed} days</strong>
                 </div>
-
-				${pendingIntimationMessage}
-
+				
                 <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
                     <span>Buffer Events Remaining:</span>
                     <strong>${bufferRemaining} days</strong>
@@ -691,7 +709,8 @@ padding-right:5px;
                     <span>Buffer Resets In:</span>
                     <strong>${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}</strong>
                 </div>
-
+				${pendingIntimationMessage}
+				${attendanceExceptionsMessage}
 ${todayMessage}
             </div>
 

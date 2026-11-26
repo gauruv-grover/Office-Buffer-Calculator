@@ -400,10 +400,33 @@ let halfDayClockOut = "--";
 
 let todayClockOut = "--";
 
+const today =
+    new Date();
+
+const cutoffDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    24
+);
+
+const regularizationCutoffDays = Math.max(
+    0,
+    Math.ceil(
+        (cutoffDate - today) /
+        (1000 * 60 * 60 * 24)
+    )
+);
+
+const cutoffColor =
+    regularizationCutoffDays <= 3 ? "#dc3545" :
+    regularizationCutoffDays <= 7 ? "#fd7e14" :
+    "#198754";
+
 var todayMessage = "";
                       
 var pendingIntimationMessage = "";
 var attendanceExceptionsMessage = "";
+var regularizationCutoffMessage = "";
 
 if (todayEntry) {
     if (!todayEntry.clockIn) {
@@ -585,12 +608,23 @@ const hasWarnings =
     pendingIntimation > 0 ||
     attendanceExceptions > 0;
 
-const statusIcon = hasWarnings
-    ? '<i class="fa-solid fa-triangle-exclamation" style="color:#ffc107;font-size:18px;" title="Action Required"></i>'
-    : '<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:18px;" title="All Clear"></i>';
+if(hasWarnings){
+	regularizationCutoffMessage = `
+	<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+    <span>Regularization Cutoff In:</span>
+    <strong style="color:${cutoffColor}">
+        ${regularizationCutoffDays} day${regularizationCutoffDays !== 1 ? "s" : ""}
+    </strong>
+</div>`;
+}
 
-const today =
-    new Date();
+const warningSymbol =
+    regularizationCutoffDays > 3 ? '<i class="fa-solid fa-triangle-exclamation" style="color:#ffc107;font-size:18px;" title="Action Required"></i>' :
+	'<i class="fa-solid fa-circle-exclamation" style="color:#dc3545;font-size:18px;" title="Urgent Action Required"></i>'
+
+const statusIcon = hasWarnings
+    ? warningSymbol
+    : '<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:18px;" title="All Clear"></i>';
 
 const lastDayOfMonth =
     new Date(
@@ -722,6 +756,7 @@ padding-right:5px;
                 </div>
 				${pendingIntimationMessage}
 				${attendanceExceptionsMessage}
+				${regularizationCutoffMessage}
 ${todayMessage}
             </div>
 

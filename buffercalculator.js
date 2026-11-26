@@ -581,6 +581,14 @@ todayMessage += `
     }
 }
 
+const hasWarnings =
+    pendingIntimation > 0 ||
+    attendanceExceptions > 0;
+
+const statusIcon = hasWarnings
+    ? '<i class="fa-solid fa-triangle-exclamation" style="color:#ffc107;font-size:18px;" title="Action Required"></i>'
+    : '<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:18px;" title="All Clear"></i>';
+
 const today =
     new Date();
 
@@ -682,6 +690,9 @@ padding-right:5px;
                     <i class="fa-solid fa-download"></i>
                 </span>
 </div>-->
+			<span>
+			    ${statusIcon}
+			</span>
             </div>
 
             <div style="padding:18px;">

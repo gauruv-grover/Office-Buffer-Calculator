@@ -427,6 +427,7 @@ var todayMessage = "";
 var pendingIntimationMessage = "";
 var attendanceExceptionsMessage = "";
 var regularizationCutoffMessage = "";
+var pendingMessage = "";
 
 if (todayEntry) {
     if (!todayEntry.clockIn) {
@@ -587,8 +588,12 @@ const hasWarnings =
     attendanceExceptions > 0;
 
 if(hasWarnings){
+	pendingMessage += `<div style="
+				        border-top:1px solid #ddd;
+				        margin:12px 0;
+				 "></div>`;
 	if(pendingIntimation > 0) {
-        pendingIntimationMessage = `
+        pendingMessage += `
         <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
         	<span>Pending Intimation:</span>
             <strong class="text-danger">${pendingIntimation} day${pendingIntimation !== 1 ? 's' : ''}
@@ -598,7 +603,7 @@ if(hasWarnings){
       }
 
 		if(attendanceExceptions>0){
-		attendanceExceptionsMessage =
+		pendingMessage +=
 		`
 		<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
 		    <span>Pending Regularization:</span>
@@ -607,7 +612,7 @@ if(hasWarnings){
 		</div>
 		`;
 		}
-	regularizationCutoffMessage = `
+	pendingMessage += `
 	<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
     <span>Regularization Cutoff In:</span>
     <strong style="color:${cutoffColor}">
@@ -769,6 +774,7 @@ padding-right:5px;
                     <span>Buffer Resets In:</span>
                     <strong>${bufferResetDays} day${bufferResetDays !== 1 ? "s" : ""}</strong>
                 </div>
+				${pendingMessage}
 				${pendingIntimationMessage}
 				${attendanceExceptionsMessage}
 				${regularizationCutoffMessage}

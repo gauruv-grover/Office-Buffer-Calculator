@@ -516,28 +516,6 @@ todayMessage =
                     <strong>${todayClockIn}</strong>
                 </div>
 `;
-      
-      if(pendingIntimation > 0) {
-        pendingIntimationMessage = `
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-        	<span>Pending Intimation:</span>
-            <strong class="text-danger">${pendingIntimation} day${pendingIntimation !== 1 ? 's' : ''}
-			</strong>
-        </div>
-                `;
-      }
-
-		if(attendanceExceptions>0){
-		attendanceExceptionsMessage =
-		`
-		<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-		    <span>Pending Regularization:</span>
-		    <strong class="text-danger">${attendanceExceptions} day${attendanceExceptions !== 1 ? 's' : ''}
-		    </strong>
-		</div>
-		`;
-		}
-
 
         if (todayClockOut === "--") {
 
@@ -609,6 +587,26 @@ const hasWarnings =
     attendanceExceptions > 0;
 
 if(hasWarnings){
+	if(pendingIntimation > 0) {
+        pendingIntimationMessage = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        	<span>Pending Intimation:</span>
+            <strong class="text-danger">${pendingIntimation} day${pendingIntimation !== 1 ? 's' : ''}
+			</strong>
+        </div>
+                `;
+      }
+
+		if(attendanceExceptions>0){
+		attendanceExceptionsMessage =
+		`
+		<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+		    <span>Pending Regularization:</span>
+		    <strong class="text-danger">${attendanceExceptions} day${attendanceExceptions !== 1 ? 's' : ''}
+		    </strong>
+		</div>
+		`;
+		}
 	regularizationCutoffMessage = `
 	<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
     <span>Regularization Cutoff In:</span>

@@ -618,7 +618,7 @@ if(hasWarnings){
 
 const warningSymbol =
     regularizationCutoffDays > 3 ? '<i class="fa-solid fa-triangle-exclamation" style="color:#ffc107;font-size:18px;" title="Action Required"></i>' :
-	'<i class="fa-solid fa-circle-exclamation" style="color:#dc3545;font-size:18px;" title="Urgent Action Required"></i>'
+	'<i class="fa-solid fa-circle-exclamation" style="color:#ff5c5c;font-size:18px;animation:pulse 1.5s infinite" title="Urgent Action Required"></i>'
 
 const statusIcon = hasWarnings
     ? warningSymbol
@@ -645,6 +645,23 @@ const bufferResetDays =
             24
         )
     );
+
+
+if (!document.getElementById("buffer-dashboard-styles")) {
+    const style = document.createElement("style");
+    style.id = "buffer-dashboard-styles";
+    style.textContent = `
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
 
 const card =
     document.createElement(
